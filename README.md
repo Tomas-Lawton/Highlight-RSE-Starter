@@ -2,7 +2,7 @@
 
 Here is some sample code showing you how to get started with: chrome extension scripts, chrome storage and DOM manipulation with content scrips.
 
-The brain of this app is the manifest.JSON.
+The brain of this app is the manifest.json.
 
 The inject script has control of the DOM on visited web pages.
 
