@@ -1,49 +1,48 @@
-console.log("Hello from content :D :D :D :D")
+console.log("Hello from content script:D :D :D :D")
 
-const getCurrentSelection = () => {
-	const url = window.location.href.toString(); // page url
-	// stack overflow
-	const text = window.getSelection();
-	const range = window.getSelection().getRangeAt(0);
-	text.removeAllRanges();
-	text.addRange(range);
-	const hTag = text.anchorNode.parentElement;
-	return [url, hTag, text]
+// Get saved highlights
+// window.onload = () => { // reloads on different pages
+// 	const url = window.location.href.toString(); // page url
+// 	// chrome.storage.sync.get('highlights', results => {
+// 	// 	console.log(results)
+// 	// 	results.highlights[url].forEach(highlight => {
+// 	// 		styleRange(highlight)
+// 	// 	})
+// 	// })
+// };
+
+// const saveHighlightToChrome = (rangeToSave) => {
+// const url = window.location.href.toString(); // page url
+// chrome.storage.sync.get('highlights', (results) => {
+// 	// create dict to store highlights on a page if it doesn't exist
+// 	if (!results.highlights[url]) {
+// 		results.highlights[url] = [];
+// 	}
+// 	results.highlights[url].push(rangeToSave);
+// 	// store
+// 	console.log('saving')
+// 	chrome.storage.sync.set({ highlights: results }, () => {
+// 		console.log('Saved highlight: ', highlights[url][highlights[url].length - 1]);
+// 	});
+// });
+// }
+
+const styleRange = (inputRange) => {
+	const highlighter = document.createElement('span');
+	highlighter.classList.add('highlight-identifier');
+	highlighter.append(inputRange.extractContents());
+	highlighter.addEventListener('click', () => {
+		highlighter.classList.remove('highlight-identifier')
+	})
+	inputRange.insertNode(highlighter);
 }
 
 const highlight = () => {
-	const [url, hTag, text] = getCurrentSelection();
-	document.designMode = "on";
-	document.execCommand("HiliteColor", false, '#C7FFD8');
-	document.designMode = "off";
-	saveHighlightToChrome();
+	const sel = getSelection();
+	const range = sel.getRangeAt(0);
+	styleRange(range)
+	// saveHighlightToChrome(range);
 };
-
-// const removeHighlight = () => {
-// 	const [url, hTag, text] = getCurrentSelection();
-
-// 	if (hTag.style.backgroundColor == 'rgb(199, 255, 216)') {
-// 		hTag.style.backgroundColor = 'transparent';
-// 		// removeHighlightFromChrome();
-// 	}
-// }
-
-const saveHighlightToChrome = () => {
-	const [url, hTag, text] = getCurrentSelection();
-	console.log("saving: ", text)
-
-	chrome.storage.sync.get('highlights', (results) => {
-		if (!results.highlights[url]) {
-			highlights[url] = [];
-		} else {
-			highlights = results.highlights;
-		}
-		highlights[url].push(text);
-		chrome.storage.sync.set({ highlights }, () => {
-			console.log('data saved: ' + highlights[url][highlights[url].length - 1]);
-		});
-	});
-}
 
 // const removeHighlightFromChrome = () => {
 // 	const [url, hTag, savedText] = getCurrentSelection();
@@ -64,13 +63,11 @@ document.addEventListener("selectionchange", () => {
 		const oRange = selection.getRangeAt(0); //get the text range
 		const { left: posX, top: posY } = oRange.getBoundingClientRect();
 		// Actual text
-		updatePopup(selection.toString(), posX, posY)
+		updatePopup(selection, posX, posY)
 	}
 })
 
-// Highlight text and save to chrome storage
-// calling highlight function in this way avoids recursion (lol)
-// document.onmouseup = highlight;
+// Sending to background script. (Open the console on the extensions page)
 
 const sendMessage = (selection) => {
 	chrome.extension.sendMessage({ messageName: selection }, function (response) {
@@ -82,33 +79,32 @@ const sendMessage = (selection) => {
 	});
 }
 
-const updatePopup = (selectionText, posX, posY) => {
+const updatePopup = (selection, posX, posY) => {
 	// Create a popup or update if already exists.
 	// Could do this many other ways, could also be good to create a CRUD
 	if (document.getElementById('popup-time-gang-gang')) {
-		updatePopupContent(selectionText, posX, posY)
+		updatePopupContent(selection, posX, posY)
 	} else {
-		createPopup(selectionText, posX, posY)
+		createPopup(selection, posX, posY)
 	}
 }
 
 const hidePopup = () => {
-	const popup = document.getElementById('popup-time-gang-gang')
-	popup.style.display = "none"
+	document.getElementById('popup-time-gang-gang').style.display = "none"
 }
 
-const updatePopupContent = (selectionText, posX, posY) => {
+const updatePopupContent = (selection, posX, posY) => {
 	const popup = document.getElementById('popup-time-gang-gang')
 
 	popup.style.display = "block" // make sure it was not hidden
 	const highlightText = document.getElementById("popup-text")
-	highlightText.innerHTML = selectionText
+	highlightText.innerHTML = selection.toString()
 
 	popup.style.top = posY - 100 + "px";
 	popup.style.left = posX - 220 + "px";
 }
 
-const createPopup = (selectionText, posX, posY) => {
+const createPopup = (selection, posX, posY) => {
 	const popupContainer = document.createElement("div");
 	popupContainer.setAttribute("id", "popup-time-gang-gang")
 	popupContainer.classList.add("position-popup")
@@ -133,16 +129,18 @@ const createPopup = (selectionText, posX, posY) => {
 	saveHighlightButton.innerHTML = "SAVE"
 	saveHighlightButton.addEventListener('click', () => {
 		// Send plain text to background script
-		sendMessage(selectionText)
+		sendMessage(selection.toString())
 		// Create actual highlight
 		highlight()
+		// hidepopup
+		hidePopup()
 	})
 	popupContainer.appendChild(saveHighlightButton);
 
 	// Dynamic Updates
 	const highlightText = document.createElement("p")
 	highlightText.setAttribute("id", "popup-text")
-	highlightText.innerHTML = selectionText
+	highlightText.innerHTML = selection.toString()
 	popupContainer.appendChild(highlightText);
 
 	popupContainer.style.top = posY - 100 + "px";

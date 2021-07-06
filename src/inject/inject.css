@@ -17,4 +17,11 @@
     cursor: pointer;
 }
 
-.highlight { color: red; }
+/* prevent line breaks from span */
+.highlight-identifier { 
+    background-color: red;
+    overflow-wrap: normal;}
+
+.highlight-identifier:hover {
+    background-color: blue;
+}
