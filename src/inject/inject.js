@@ -1,31 +1,39 @@
 console.log("Hello from content script:D :D :D :D")
 
-// Get saved highlights
-// window.onload = () => { // reloads on different pages
-// 	const url = window.location.href.toString(); // page url
-// 	// chrome.storage.sync.get('highlights', results => {
-// 	// 	console.log(results)
-// 	// 	results.highlights[url].forEach(highlight => {
-// 	// 		styleRange(highlight)
-// 	// 	})
-// 	// })
-// };
+window.onload = () => {
+	const url = window.location.href.toString(); // page url
+	chrome.storage.sync.get('highlights', results => {
+		console.log("Loaded: ", results)
+		results.highlights[url].forEach(highlightRange => {
+			styleRange(highlightRange)
+		})
+	})
+	// clears storage
+	// chrome.storage.sync.clear((m) => {
+	// 	console.log(m)
+	// })
+};
 
-// const saveHighlightToChrome = (rangeToSave) => {
-// const url = window.location.href.toString(); // page url
-// chrome.storage.sync.get('highlights', (results) => {
-// 	// create dict to store highlights on a page if it doesn't exist
-// 	if (!results.highlights[url]) {
-// 		results.highlights[url] = [];
-// 	}
-// 	results.highlights[url].push(rangeToSave);
-// 	// store
-// 	console.log('saving')
-// 	chrome.storage.sync.set({ highlights: results }, () => {
-// 		console.log('Saved highlight: ', highlights[url][highlights[url].length - 1]);
-// 	});
-// });
-// }
+const saveHighlightToChrome = (rangeToSave) => {
+	const url = window.location.href.toString(); // page url
+	chrome.storage.sync.get('highlights', (results) => {
+		let highlightObj
+		if (!results.highlights) {
+			highlightObj = {}
+		} else {
+			highlightObj = results.highlights
+		}
+		let allHightlights = highlightObj
+		if (!allHightlights[url]) {
+			allHightlights[url] = [];
+		}
+		allHightlights[url].push(rangeToSave);
+		console.log("all ", allHightlights)
+		chrome.storage.sync.set({ highlights: allHightlights }, () => {
+			console.log('Saved highlight: ', allHightlights);
+		});
+	});
+}
 
 const styleRange = (inputRange) => {
 	const highlighter = document.createElement('span');
@@ -37,38 +45,23 @@ const styleRange = (inputRange) => {
 	inputRange.insertNode(highlighter);
 }
 
-const highlight = () => {
-	const sel = getSelection();
-	const range = sel.getRangeAt(0);
+const highlight = (selection) => {
+	const range = selection.getRangeAt(0);
 	styleRange(range)
-	// saveHighlightToChrome(range);
+	saveHighlightToChrome(range);
 };
 
-// const removeHighlightFromChrome = () => {
-// 	const [url, hTag, savedText] = getCurrentSelection();
-
-// 	chrome.storage.sync.get('highlights', (results) => {
-// 		highlights = results.highlights;
-// 		var index = highlights[url].indexOf(savedText.anchorNode.textContent);
-// 		var removedEl = highlights[url].splice(index, 1);
-// 		chrome.storage.sync.set({ highlights }, () => {
-// 			console.log('element removed: ' + removedEl);
-// 		});
-// 	});
-// }
-
-document.addEventListener("selectionchange", () => {
+// Entry point
+document.addEventListener("mouseup", () => { // works a lil better than selectionchange event
 	let selection = document.getSelection()
 	if (selection.toString().length > 0) {
 		const oRange = selection.getRangeAt(0); //get the text range
 		const { left: posX, top: posY } = oRange.getBoundingClientRect();
-		// Actual text
 		updatePopup(selection, posX, posY)
 	}
 })
 
 // Sending to background script. (Open the console on the extensions page)
-
 const sendMessage = (selection) => {
 	chrome.extension.sendMessage({ messageName: selection }, function (response) {
 		var readyStateCheckInterval = setInterval(function () {
@@ -131,7 +124,7 @@ const createPopup = (selection, posX, posY) => {
 		// Send plain text to background script
 		sendMessage(selection.toString())
 		// Create actual highlight
-		highlight()
+		highlight(selection)
 		// hidepopup
 		hidePopup()
 	})
@@ -148,13 +141,3 @@ const createPopup = (selection, posX, posY) => {
 
 	document.querySelector("body").appendChild(popupContainer);
 }
-
-
-// const highlightAllPs = () => {
-// 	const highlightedItems = document.querySelectorAll("p");
-// 	highlightedItems.forEach((domItem) => {
-// 		domItem.style.backgroundColor = "#EBE71F"
-// 	});
-// }
-
-// highlightAllPs();
