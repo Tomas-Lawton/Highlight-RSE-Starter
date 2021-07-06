@@ -8,32 +8,29 @@ const getCurrentSelection = () => {
 	text.removeAllRanges();
 	text.addRange(range);
 	const hTag = text.anchorNode.parentElement;
-	const savedText = text;
-	return [url, hTag, savedText]
+	return [url, hTag, text]
 }
 
 const highlight = () => {
-	const [url, hTag, savedText] = getCurrentSelection();
+	const [url, hTag, text] = getCurrentSelection();
 	document.designMode = "on";
 	document.execCommand("HiliteColor", false, '#C7FFD8');
 	document.designMode = "off";
-
-
-
-	// saveHighlightToChrome();
+	saveHighlightToChrome();
 };
 
-const removeHighlight = () => {
-	const [url, hTag, savedText] = getCurrentSelection();
+// const removeHighlight = () => {
+// 	const [url, hTag, text] = getCurrentSelection();
 
-	if (hTag.style.backgroundColor == 'rgb(199, 255, 216)') {
-		hTag.style.backgroundColor = 'transparent';
-		// removeHighlightFromChrome();
-	}
-}
+// 	if (hTag.style.backgroundColor == 'rgb(199, 255, 216)') {
+// 		hTag.style.backgroundColor = 'transparent';
+// 		// removeHighlightFromChrome();
+// 	}
+// }
 
 const saveHighlightToChrome = () => {
-	const [url, hTag, savedText] = getCurrentSelection();
+	const [url, hTag, text] = getCurrentSelection();
+	console.log("saving: ", text)
 
 	chrome.storage.sync.get('highlights', (results) => {
 		if (!results.highlights[url]) {
@@ -41,26 +38,25 @@ const saveHighlightToChrome = () => {
 		} else {
 			highlights = results.highlights;
 		}
-
-		highlights[url].push(savedText.anchorNode.textContent);
+		highlights[url].push(text);
 		chrome.storage.sync.set({ highlights }, () => {
 			console.log('data saved: ' + highlights[url][highlights[url].length - 1]);
 		});
 	});
 }
 
-const removeHighlightFromChrome = () => {
-	const [url, hTag, savedText] = getCurrentSelection();
+// const removeHighlightFromChrome = () => {
+// 	const [url, hTag, savedText] = getCurrentSelection();
 
-	chrome.storage.sync.get('highlights', (results) => {
-		highlights = results.highlights;
-		var index = highlights[url].indexOf(savedText.anchorNode.textContent);
-		var removedEl = highlights[url].splice(index, 1);
-		chrome.storage.sync.set({ highlights }, () => {
-			console.log('element removed: ' + removedEl);
-		});
-	});
-}
+// 	chrome.storage.sync.get('highlights', (results) => {
+// 		highlights = results.highlights;
+// 		var index = highlights[url].indexOf(savedText.anchorNode.textContent);
+// 		var removedEl = highlights[url].splice(index, 1);
+// 		chrome.storage.sync.set({ highlights }, () => {
+// 			console.log('element removed: ' + removedEl);
+// 		});
+// 	});
+// }
 
 document.addEventListener("selectionchange", () => {
 	let selection = document.getSelection()

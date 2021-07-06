@@ -16,3 +16,5 @@
     border: none;
     cursor: pointer;
 }
+
+.highlight { color: red; }
