@@ -17,5 +17,9 @@ chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     if (request.messageName)
       console.log("Background: ", request);
+    // Open another window
+    chrome.tabs.create({
+      url: chrome.runtime.getURL("ReactCode/reactcode/dist/popup.html"),
+    });
   }
 );

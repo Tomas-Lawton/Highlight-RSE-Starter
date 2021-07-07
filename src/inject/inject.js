@@ -2,35 +2,32 @@ console.log("Hello from content script:D :D :D :D")
 
 window.onload = () => {
 	const url = window.location.href.toString(); // page url
-	chrome.storage.sync.get('highlights', results => {
+	console.log("Locally loaded: ", localStorage.getItem([url]))
+
+	chrome.storage.local.get([url], results => {
 		console.log("Loaded: ", results)
-		results.highlights[url].forEach(highlightRange => {
-			styleRange(highlightRange)
-		})
+		if (results[url]) {
+			results[url].forEach(highlightRange => {
+				console.log("Highlight is: ", highlightRange)
+				styleRange(highlightRange)
+			})
+		}
 	})
 	// clears storage
-	// chrome.storage.sync.clear((m) => {
+	// chrome.storage.local.clear((m) => {
 	// 	console.log(m)
 	// })
 };
-
 const saveHighlightToChrome = (rangeToSave) => {
 	const url = window.location.href.toString(); // page url
-	chrome.storage.sync.get('highlights', (results) => {
-		let highlightObj
-		if (!results.highlights) {
-			highlightObj = {}
-		} else {
-			highlightObj = results.highlights
-		}
-		let allHightlights = highlightObj
-		if (!allHightlights[url]) {
-			allHightlights[url] = [];
-		}
-		allHightlights[url].push(rangeToSave);
-		console.log("all ", allHightlights)
-		chrome.storage.sync.set({ highlights: allHightlights }, () => {
-			console.log('Saved highlight: ', allHightlights);
+	chrome.storage.local.get([url], (results) => {
+		console.log('res: ', results)
+		let highlightObj = results[url] ? results[url] : [] //ternary operator
+		highlightObj.push(rangeToSave);
+		localStorage.setItem([url], highlightObj)
+
+		chrome.storage.local.set({ [url]: highlightObj }, () => {
+			console.log('Saved highlight: ', highlightObj);
 		});
 	});
 }
@@ -47,6 +44,7 @@ const styleRange = (inputRange) => {
 
 const highlight = (selection) => {
 	const range = selection.getRangeAt(0);
+	console.log("Sel is: ", range)
 	styleRange(range)
 	saveHighlightToChrome(range);
 };
