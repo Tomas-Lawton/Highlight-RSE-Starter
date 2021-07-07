@@ -2,9 +2,7 @@ console.log("Hello from content script:D :D :D :D")
 
 window.onload = () => {
 	const url = window.location.href.toString(); // page url
-	console.log("Locally loaded: ", localStorage.getItem([url]))
-
-	chrome.storage.local.get([url], results => {
+	chrome.storage.sync.get([url], results => {
 		console.log("Loaded: ", results)
 		if (results[url]) {
 			results[url].forEach(highlightRange => {
@@ -14,32 +12,33 @@ window.onload = () => {
 		}
 	})
 	// clears storage
-	// chrome.storage.local.clear((m) => {
+	// chrome.storage.sync.clear((m) => {
 	// 	console.log(m)
 	// })
 };
 const saveHighlightToChrome = (rangeToSave) => {
 	const url = window.location.href.toString(); // page url
-	chrome.storage.local.get([url], (results) => {
+	chrome.storage.sync.get([url], (results) => {
 		console.log('res: ', results)
 		let highlightObj = results[url] ? results[url] : [] //ternary operator
 		highlightObj.push(rangeToSave);
-		localStorage.setItem([url], highlightObj)
-
-		chrome.storage.local.set({ [url]: highlightObj }, () => {
+		chrome.storage.sync.set({ [url]: highlightObj }, () => {
 			console.log('Saved highlight: ', highlightObj);
 		});
 	});
 }
 
 const styleRange = (inputRange) => {
-	const highlighter = document.createElement('span');
-	highlighter.classList.add('highlight-identifier');
-	highlighter.append(inputRange.extractContents());
-	highlighter.addEventListener('click', () => {
-		highlighter.classList.remove('highlight-identifier')
-	})
-	inputRange.insertNode(highlighter);
+	console.log('highlight range: ', inputRange)
+	if (Object.keys(inputRange)) {
+		const highlighter = document.createElement('span');
+		highlighter.classList.add('highlight-identifier');
+		highlighter.append(inputRange.extractContents());
+		highlighter.addEventListener('click', () => {
+			highlighter.classList.remove('highlight-identifier')
+		})
+		inputRange.insertNode(highlighter);
+	}
 }
 
 const highlight = (selection) => {
