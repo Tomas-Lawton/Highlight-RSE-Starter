@@ -1,4 +1,6 @@
 console.log("Hello from content script:D :D :D :D")
+let color = 'red'
+
 
 window.onload = () => {
 	const url = window.location.href.toString(); // page url
@@ -32,10 +34,12 @@ const styleRange = (inputRange) => {
 	console.log('highlight range: ', inputRange)
 	if (Object.keys(inputRange)) {
 		const highlighter = document.createElement('span');
-		highlighter.classList.add('highlight-identifier');
+		highlighter.classList.add(`highlight-identifier-${color}`);
 		highlighter.append(inputRange.extractContents());
 		highlighter.addEventListener('click', () => {
-			highlighter.classList.remove('highlight-identifier')
+			highlighter.classList.remove(`highlight-identifier-red`)
+			highlighter.classList.remove(`highlight-identifier-green`)
+			highlighter.classList.remove(`highlight-identifier-blue`)
 		})
 		inputRange.insertNode(highlighter);
 	}
@@ -94,6 +98,19 @@ const updatePopupContent = (selection, posX, posY) => {
 	popup.style.left = posX - 220 + "px";
 }
 
+const createColorButtons = () => {
+	const colors = ['red', 'green', 'blue']
+	for (const thisColor of colors) {
+		console.log(thisColor)
+		let colorButton = document.createElement("button")
+		colorButton.innerHTML = color
+		colorButton.addEventListener('click', () => {
+			color = thisColor
+		})
+		document.getElementById('popup-time-gang-gang').appendChild(colorButton);
+	}
+}
+
 const createPopup = (selection, posX, posY) => {
 	const popupContainer = document.createElement("div");
 	popupContainer.setAttribute("id", "popup-time-gang-gang")
@@ -137,4 +154,6 @@ const createPopup = (selection, posX, posY) => {
 	popupContainer.style.left = posX - 220 + "px";
 
 	document.querySelector("body").appendChild(popupContainer);
+	createColorButtons();
+
 }

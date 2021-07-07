@@ -18,10 +18,29 @@
 }
 
 /* prevent line breaks from span */
-.highlight-identifier { 
+.highlight-identifier-red { 
     background-color: red;
-    overflow-wrap: normal;}
+    overflow-wrap: normal;
+}
 
-.highlight-identifier:hover {
+.highlight-identifier-green { 
+    background-color: green;
+    overflow-wrap: normal;
+}
+
+.highlight-identifier-blue { 
+    background-color: yellow;
+    overflow-wrap: normal;
+}
+
+.highlight-identifier-red:hover {
+    background-color: blue;
+}
+
+.highlight-identifier-green:hover {
+    background-color: blue;
+}
+
+.highlight-identifier-blue:hover {
     background-color: blue;
 }
