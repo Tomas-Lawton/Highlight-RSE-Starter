@@ -11,7 +11,6 @@ build() {
     react-scripts build
 
     mkdir -p build
-    mv build/index.html build/popup.html
 
 }
 
