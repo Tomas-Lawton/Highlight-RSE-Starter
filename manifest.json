@@ -37,6 +37,14 @@
       "js": [
         "src/inject/inject.js"
       ]
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "src/inject/spookycode.js"
+      ]
     }
   ]
 }
