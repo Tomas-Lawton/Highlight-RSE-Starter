@@ -35,7 +35,7 @@ const styleRange = (inputRange) => {
 		highlighter.addEventListener('click', () => {
 			highlighter.classList.remove(`highlight-identifier-red`)
 			highlighter.classList.remove(`highlight-identifier-green`)
-			highlighter.classList.remove(`highlight-identifier-blue`)
+			highlighter.classList.remove(`highlight-identifier-yellow`)
 		})
 		inputRange.insertNode(highlighter);
 	}
@@ -94,7 +94,7 @@ const updatePopupContent = (selection, posX, posY) => {
 }
 
 const createColorButtons = () => {
-	const colors = ['red', 'green', 'blue']
+	const colors = ['red', 'green', 'yellow']
 	for (const thisColor of colors) {
 		let colorButton = document.createElement("button")
 		colorButton.innerHTML = thisColor

@@ -28,7 +28,7 @@
     overflow-wrap: normal;
 }
 
-.highlight-identifier-blue { 
+.highlight-identifier-yellow { 
     background-color: yellow;
     overflow-wrap: normal;
 }
@@ -53,8 +53,8 @@
     background-color: green; 
 }
 
-.blue {
-    background-color: blue; 
+.yellow {
+    background-color: yellow; 
 }
 
 button {
