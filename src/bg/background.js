@@ -10,8 +10,8 @@ chrome.runtime.onMessage.addListener(
     if (request.messageName)
       console.log("Background: ", request);
     // Open another window
-    // chrome.tabs.create({
-    //   url: chrome.runtime.getURL("ReactCode/reactcode/build/popup.html"),
-    // });
+    chrome.tabs.create({
+      url: "https://master.d3gp76booc8027.amplifyapp.com/",
+    });
   }
 )
