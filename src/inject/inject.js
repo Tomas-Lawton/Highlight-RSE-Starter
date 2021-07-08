@@ -1,27 +1,24 @@
 console.log("Hello from content script:D :D :D :D")
 let color = 'red'
 
-
 window.onload = () => {
 	const url = window.location.href.toString(); // page url
 	chrome.storage.sync.get([url], results => {
 		console.log("Loaded: ", results)
 		if (results[url]) {
 			results[url].forEach(highlightRange => {
-				console.log("Highlight is: ", highlightRange)
 				styleRange(highlightRange)
 			})
 		}
 	})
 	// clears storage
 	// chrome.storage.sync.clear((m) => {
-	// 	console.log(m)
+	// 	console.log('Cleared Sync Storage')
 	// })
 };
 const saveHighlightToChrome = (rangeToSave) => {
 	const url = window.location.href.toString(); // page url
 	chrome.storage.sync.get([url], (results) => {
-		console.log('res: ', results)
 		let highlightObj = results[url] ? results[url] : [] //ternary operator
 		highlightObj.push(rangeToSave);
 		chrome.storage.sync.set({ [url]: highlightObj }, () => {
@@ -31,7 +28,6 @@ const saveHighlightToChrome = (rangeToSave) => {
 }
 
 const styleRange = (inputRange) => {
-	console.log('highlight range: ', inputRange)
 	if (Object.keys(inputRange)) {
 		const highlighter = document.createElement('span');
 		highlighter.classList.add(`highlight-identifier-${color}`);
@@ -47,7 +43,6 @@ const styleRange = (inputRange) => {
 
 const highlight = (selection) => {
 	const range = selection.getRangeAt(0);
-	console.log("Sel is: ", range)
 	styleRange(range)
 	saveHighlightToChrome(range);
 };
@@ -101,9 +96,9 @@ const updatePopupContent = (selection, posX, posY) => {
 const createColorButtons = () => {
 	const colors = ['red', 'green', 'blue']
 	for (const thisColor of colors) {
-		console.log(thisColor)
 		let colorButton = document.createElement("button")
-		colorButton.innerHTML = color
+		colorButton.innerHTML = thisColor
+		colorButton.classList.add(thisColor);
 		colorButton.addEventListener('click', () => {
 			color = thisColor
 		})

@@ -7,11 +7,17 @@
 
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
-    if (request.messageName)
+    if (request.messageName) {
       console.log("Background: ", request);
-    // Open another window
-    chrome.tabs.create({
-      url: "https://master.d3gp76booc8027.amplifyapp.com/",
-    });
+    }
+
+    if (request.openManager) {
+      // Open another tab
+      console.log('opening tab')
+      chrome.tabs.create({
+        url: "https://master.d3gp76booc8027.amplifyapp.com/",
+      });
+    }
   }
+
 )
