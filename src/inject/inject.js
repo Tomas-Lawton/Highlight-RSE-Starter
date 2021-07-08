@@ -18,7 +18,7 @@ window.onload = () => {
 };
 const saveHighlightToChrome = (rangeToSave) => {
 	const url = window.location.href.toString(); // page url
-	chrome.storage.sync.get([url], (results) => {
+	chrome.storage.sync.get(url, (results) => {
 		let highlightObj = results[url] ? results[url] : [] //ternary operator
 		highlightObj.push(rangeToSave);
 		chrome.storage.sync.set({ [url]: highlightObj }, () => {
