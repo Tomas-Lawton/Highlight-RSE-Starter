@@ -103,12 +103,12 @@ convertToRange = (serial) => {
 			endPos = eC.length;
 		}
 
-		try {
-			range.setEnd(eC, endPos);
-		}
-		catch (e) {
-			console.log('caret restore not allowed');
-		}
+		// try {
+		range.setEnd(eC, endPos);
+		// }
+		// catch (e) {
+		// 	console.log('caret restore not allowed');
+		// }
 	}
 	sel.removeAllRanges();
 	sel.addRange(range);
